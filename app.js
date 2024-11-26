@@ -1,12 +1,48 @@
 class IntervalCountdown {
-    constructor(quickPlayIntervals, countdownElement) {
+    constructor(quickPlayIntervals, countdownElement, gameTimesElement) {
         // Convert minutes and seconds to just minutes for easier comparison
         this.quickPlayIntervals = quickPlayIntervals.map(interval => ({
             start: interval.startMinutes + (interval.startSeconds / 60),
             end: interval.endMinutes + (interval.endSeconds / 60)
         }));
         this.countdownElement = countdownElement;
+        this.gameTimesElement = gameTimesElement;
         this.timerId = null;
+        this.updateGameTimesText();
+    }
+
+    formatTimeComponent(minutes, seconds) {
+        const minuteStr = minutes.toString().padStart(2, '0');
+        const secondStr = seconds.toString().padStart(2, '0');
+        return `:${minuteStr}${seconds > 0 ? `-:${secondStr}` : ''}`;
+    }
+
+    getTimeRangeText(interval) {
+        const startMinutes = Math.floor(interval.start);
+        const startSeconds = Math.round((interval.start % 1) * 60);
+        const endMinutes = Math.floor(interval.end);
+        const endSeconds = Math.round((interval.end % 1) * 60);
+
+        return `${this.formatTimeComponent(startMinutes, startSeconds)}-${this.formatTimeComponent(endMinutes, endSeconds)}`;
+    }
+
+    updateGameTimesText() {
+        if (!this.gameTimesElement) return;
+
+        const timeRanges = this.quickPlayIntervals.map(interval => 
+            this.getTimeRangeText(interval)
+        );
+
+        let text = 'Games run';
+        if (timeRanges.length === 1) {
+            text += ` from ${timeRanges[0]}`;
+        } else {
+            const lastRange = timeRanges.pop();
+            text += ` from ${timeRanges.join(', ')} and ${lastRange}`;
+        }
+        text += ' every hour!';
+
+        this.gameTimesElement.innerHTML = `<p class="gameTimes">${text}</p>`;
     }
 
     isInQuickPlayPeriod() {
@@ -81,6 +117,7 @@ class IntervalCountdown {
 
     start() {
         this.updateCountdown();
+        this.updateGameTimesText();
         this.timerId = setInterval(() => this.updateCountdown(), 1000);
         return () => this.stop();
     }
@@ -96,15 +133,16 @@ class IntervalCountdown {
 // Example usage:
 const quickPlayIntervals = [
     { 
-        startMinutes: 25, startSeconds: 0,  // 15:30
-        endMinutes: 29, endSeconds: 59        // 25:00
+        startMinutes: 25, startSeconds: 0,  // 25:00
+        endMinutes: 30, endSeconds: 0       // 30:00
     },
     {
-        startMinutes: 55, startSeconds: 0,   // 
-        endMinutes: 59, endSeconds: 59       // 
+        startMinutes: 55, startSeconds: 0,  // 55:00
+        endMinutes: 60, endSeconds: 0       // 60:00
     }
 ];
 
 const countdownTimer = document.getElementById('countdownTimer');
-const countdown = new IntervalCountdown(quickPlayIntervals, countdownTimer);
+const gameTimes = document.getElementById('gameTimes');
+const countdown = new IntervalCountdown(quickPlayIntervals, countdownTimer, gameTimes);
 countdown.start();
