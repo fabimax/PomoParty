@@ -1,0 +1,6 @@
+OGar Server - Game Mode: Free For All - Running Time: 42sec
+ID:    1, Nick: [BOT] Confederate, Score:    193, Cells:  1, Status: 1 IP: BOT
+ID:    2, Nick: [BOT] Argentina, Score:    163, Cells:  1, Status: 1 IP: BOT
+ID:    3, Nick: [BOT] Russia   , Score:    179, Cells:  1, Status: 1 IP: BOT
+ID:    4, Nick: liz            , Score:     27, Cells:  1, Status: 0 IP: 127.0.0.1
+ID:    5, Nick: liz            , Score:     29, Cells:  1, Status: 0 IP: 127.0.0.1
