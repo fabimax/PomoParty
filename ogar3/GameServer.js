@@ -6,6 +6,7 @@ var http = require('http');
 var finalhandler = require('finalhandler');
 var fs = require("fs");
 var myos = require("os");
+var path = require('path');
 
 var ini = require('./modules/ini.js');
 
@@ -18,7 +19,7 @@ var Gamemode = require('./gamemodes');
 var BotLoader = require('./ai/BotLoader');
 var Logger = require('./modules/log');
 var serveStatic = require('serve-static');
-var serve = serveStatic('./client/');
+var serve = serveStatic(path.join(__dirname, 'client'));
 // GameServer implementation
 function GameServer() {
     // Startup 
@@ -70,7 +71,7 @@ function GameServer() {
         serverOldColors: 0,           // If the server uses colors from the original Ogar
         serverViewBaseX: 1024,        // Base view distance of players. Warning: high values may cause lag
         serverViewBaseY: 592,
-        serverStatsPort: 88,          // Port for stats server. Having a negative number will disable the stats server.
+        serverStatsPort: -88,          // Port for stats server. Having a negative number will disable the stats server.
         serverStatsUpdate: 60,        // Amount of seconds per update for the server stats
         serverLogLevel: 2,            // Logging level of the server. 0 = No logs, 1 = Logs the console, 2 = Logs console and ip connections
         gameLBlength: 10,             // Number of names to display on Leaderboard (Vanilla value: 10)
@@ -157,9 +158,10 @@ GameServer.prototype.start = function() {
     var hserver = http.createServer( function(req, res){
     res.setHeader('Access-Control-Allow-Origin', '*');
       var done = finalhandler(req, res)
-	 // res.end({title:12})
+	  // res.end({title:12})
       serve(req, res, done)
     });
+    // I'm interested in this
     hserver.listen(this.config.serverPort,"0.0.0.0",this.onHttpServerOpen.bind(this));
     this.socketServer = new WebSocket.Server({server: hserver, perMessageDeflate: false});
     this.socketServer.on('connection', connectionEstablished.bind(this));
@@ -236,6 +238,7 @@ GameServer.prototype.start = function() {
         this.clients.push(ws);
         this.MasterPing();
     }
+    console.log('1')
     this.startStatsServer(this.config.serverStatsPort);
 };
 GameServer.prototype.onHttpServerOpen = function() {
@@ -1025,8 +1028,8 @@ GameServer.prototype.switchSpectator = function(player) {
 
 GameServer.prototype.MasterPing = function() {
     try {
-    fs.renameSync('./client/api/stats.txt', './client/api/stats.txt.bak');
-    fs.appendFileSync('./client/api/stats.txt',String(this.stats));
+    fs.renameSync(path.join(__dirname, 'client/api/stats.txt'), path.join(__dirname, 'client/api/stats.txt.bak'));
+    fs.appendFileSync(path.join(__dirname, 'client/api/stats.txt'),String(this.stats));
     } catch(error) {
         fs.appendFileSync('./client/api/stats.txt',String(this.stats));
     }
@@ -1034,8 +1037,10 @@ GameServer.prototype.MasterPing = function() {
 
 // Stats server
 GameServer.prototype.startStatsServer = function(port) {
+    console.log('2')
     // Do not start the server if the port is negative
-    if (port < 1) {
+    if (true || port < 1) {
+        console.log('3')
         return;
     }
 

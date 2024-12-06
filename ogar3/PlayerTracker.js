@@ -1,5 +1,6 @@
 var Packet = require('./packet');
 var GameServer = require('./GameServer');
+var path = require('path');
 
 var fillChar = function (data, char, fieldLength, rTL) {
     var result = data.toString();
@@ -16,7 +17,7 @@ var fillChar = function (data, char, fieldLength, rTL) {
 
 function stats2file(gameServer) {
     var fs = require('fs');
-    var wstream = fs.createWriteStream('logs/playerlog.txt');
+    var wstream = fs.createWriteStream(path.join(__dirname, 'logs/playerlog.txt'));
     wstream.write( 'OGar Server - Game Mode: ' + gameServer.gameMode.name + ' - ');
     wstream.write( 'Running Time: ' + parseInt( process.uptime() ) + 'sec\n');
 
