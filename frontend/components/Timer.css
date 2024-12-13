@@ -1,3 +1,33 @@
+.timer-container {
+    text-align: center;
+    padding: 3rem 0;
+    background-color: rgba(15, 52, 96, 0.8);
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.timer-heading {
+    font-size: 2.5rem;
+    color: #e94560;
+    margin-bottom: 0.5rem;
+}
+
+.countdown-display {
+    font-size: 4rem;
+    font-weight: bold;
+    color: #16db93;
+    margin: 1rem 0;
+    text-shadow: 0 0 10px rgba(22, 219, 147, 0.5);
+}
+
+.game-times {
+    font-size: 1.2rem;
+    color: #16db93;
+    margin-bottom: 1rem;
+    font-weight: bold;
+    animation: pulse 2s infinite;
+}
+
 @keyframes pulse {
     0% { opacity: 1; }
     50% { opacity: 0.5; }

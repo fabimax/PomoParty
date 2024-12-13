@@ -238,7 +238,6 @@ GameServer.prototype.start = function() {
         this.clients.push(ws);
         this.MasterPing();
     }
-    console.log('1')
     this.startStatsServer(this.config.serverStatsPort);
 };
 GameServer.prototype.onHttpServerOpen = function() {
@@ -1036,10 +1035,8 @@ GameServer.prototype.MasterPing = function() {
 
 // Stats server
 GameServer.prototype.startStatsServer = function(port) {
-    console.log('2')
     // Do not start the server if the port is negative
     if (true || port < 1) {
-        console.log('3')
         return;
     }
 

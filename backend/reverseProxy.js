@@ -1,98 +1,74 @@
+// WARNING: THIS FILE HAS NOT BEEN REFACTORED
+
+
 import express from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import cookieParser from 'cookie-parser';
 
-export function startReverseProxy() {
-    const app = express();
-    const PORT = 8080;
+// Configuration
+const PROXY_PORT = 9000;
+const TARGET_PORT = 8084;
+const TARGET_HOST = 'localhost';
+const TARGET_URL = `http://${TARGET_HOST}:${TARGET_PORT}`;
+
+// Create Express app
+const app = express();
+
+// Add cookie parser middleware
+app.use(cookieParser());
+
+// Log middleware to inspect cookies
+app.use((req, res, next) => {
+    if (req.cookies) {
+        console.log('Cookies:', req.cookies);
+    }
+    next();
+});
+
+// Create proxy middleware
+const proxyMiddleware = createProxyMiddleware({
+    target: TARGET_URL,
+    ws: true, // Enable WebSocket proxy
+    changeOrigin: true,
+    logLevel: 'debug',
     
-    // Cache for proxy instances
-    const proxyCache = new Map();
+    // Optional: Modify headers or handle specific paths
+    onProxyReq: (proxyReq, req, res) => {
+        // You can modify proxy request headers here if needed
+        console.log(`Proxying ${req.method} request to: ${proxyReq.path}`);
+    },
 
-    app.use(cookieParser());
+    // Handle WebSocket upgrades
+    onProxyReqWs: (proxyReq, req, socket, options, head) => {
+        console.log('WebSocket connection:', req.url);
+    },
 
-    const getOrCreateProxy = (portNumber) => {
-        if (proxyCache.has(portNumber)) {
-            return proxyCache.get(portNumber);
-        }
+    // Handle proxy errors
+    onError: (err, req, res) => {
+        console.error('Proxy Error:', err);
+        res.status(500).send('Proxy Error');
+    }
+});
 
-        const proxy = createProxyMiddleware({
-            target: `http://localhost:${portNumber}`,
-            ws: true,
-            changeOrigin: true,
-            onError: (err, req, res) => {
-                console.error('Proxy Error:', err);
-                res.status(502).send('Proxy Error');
-            }
-        });
+// Apply proxy middleware to all routes
+app.use('/', proxyMiddleware);
 
-        proxyCache.set(portNumber, proxy);
-        return proxy;
-    };
+// Start the server
+const server = app.listen(PROXY_PORT, () => {
+    console.log(`Reverse Proxy Server running on port ${PROXY_PORT}`);
+    console.log(`Forwarding to ${TARGET_URL}`);
+});
 
-    const handleRoomProxy = (req, res, next) => {
-        const roomPort = req.cookies.room;
-        
-        if (!roomPort) {
-            return res.status(400).send('Please join a room first');
-        }
+// Handle server errors
+server.on('error', (err) => {
+    console.error('Server error:', err);
+});
 
-        const portNumber = parseInt(roomPort);
-        if (isNaN(portNumber) || portNumber < 8081 || portNumber > 8100) {
-            return res.status(400).send('Invalid room');
-        }
-
-        const proxy = getOrCreateProxy(portNumber);
-        return proxy(req, res, next);
-    };
-
-    app.use('/', handleRoomProxy);
-
-    const server = app.listen(PORT, () => {
-        console.log(`Reverse proxy listening on port ${PORT}`);
+// Graceful shutdown
+process.on('SIGTERM', () => {
+    console.log('Received SIGTERM signal. Closing server...');
+    server.close(() => {
+        console.log('Server closed');
+        process.exit(0);
     });
-
-    server.on('upgrade', (req, socket, head) => {
-        console.log('WebSocket upgrade request received');
-        
-        if (!req.headers.cookie) {
-            console.log('No cookies found in upgrade request');
-            socket.destroy();
-            return;
-        }
-
-        const cookies = req.headers.cookie.split(';')
-            .reduce((acc, cookie) => {
-                const [key, value] = cookie.trim().split('=');
-                acc[key] = value;
-                return acc;
-            }, {});
-
-        const roomPort = cookies?.room;
-
-        if (!roomPort) {
-            console.log('No room cookie found in upgrade request');
-            socket.destroy();
-            return;
-        }
-
-        const portNumber = parseInt(roomPort);
-        if (isNaN(portNumber) || portNumber < 8081 || portNumber > 8100) {
-            console.log('Invalid room port number:', roomPort);
-            socket.destroy();
-            return;
-        }
-
-        console.log(`Upgrading WebSocket connection for room port: ${portNumber}`);
-        const proxy = getOrCreateProxy(portNumber);
-        
-        proxy.upgrade(req, socket, head, (err) => {
-            if (err) {
-                console.error('WebSocket upgrade error:', err);
-                socket.destroy();
-            }
-        });
-    });
-
-    return server;
-}
+});

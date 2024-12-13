@@ -1,0 +1,15 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.6;
+    color: #f0f0f0;
+    background-color: #1a1a2e;
+    margin: 0;
+    padding: 0;
+}
+
+.footer {
+    text-align: center;
+    padding: 1rem 0;
+    background-color: #0f3460;
+    margin-top: 2rem;
+} 
