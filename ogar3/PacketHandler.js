@@ -1,5 +1,7 @@
 var Packet = require('./packet');
 var Commands = require('./modules/CommandList');
+var path = require('path');
+
 var LastMsg;
 var SpamBlock;
 
@@ -193,7 +195,7 @@ PacketHandler.prototype.handleMessage = function(message) {
             hour += ":" + min;
 
             var fs = require('fs');
-            var wstream = fs.createWriteStream('logs/chat.log', {flags: 'a'});
+            var wstream = fs.createWriteStream(path.join(__dirname, 'logs/chat.log'), {flags: 'a'});
             wstream.write( '[' + hour + '] ' + wname + ': ' + message + '\n');
             wstream.end();
 

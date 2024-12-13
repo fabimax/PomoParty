@@ -12,5 +12,5 @@ coverage
 .nyc_output
 .vercel
 .parcel-cache/
-
+dist/
 

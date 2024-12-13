@@ -179,7 +179,7 @@ GameServer.prototype.start = function() {
                 console.log("[Error] Unhandled error code: "+e.code);
                 break;
         }
-        process.exit(1); // Exits the program
+        throw e;
     });
 
     function connectionEstablished(ws) {
@@ -492,13 +492,12 @@ GameServer.prototype.mainLoop = function() {
 
 GameServer.prototype.exitserver = function() {
     console.log("Server Shutdown!");
-    if ( this.sqlconfig.host != '' )
-    {
+    if ( this.sqlconfig.host != '' ) {
         this.mysql.connect();
-		}
-		this.socketServer.close();
-		process.exit(1);
-		window.close();		
+    }
+    this.socketServer.close();
+    // process.exit(1);
+    // window.close();		
 }
 
 GameServer.prototype.updateClients = function() {

@@ -5,9 +5,6 @@ import { fileURLToPath } from 'url';
 import openid from 'express-openid-connect';
 const { auth, requiresAuth } = openid;
 import dotenv from 'dotenv';
-import { db } from './db/index.js';
-import { rooms } from './db/schema.js';
-import { eq } from 'drizzle-orm';
 
 dotenv.config();
 
@@ -15,7 +12,6 @@ export function startApiServer() {
     const app = express();
     const PORT = 8000;
     
-    // Get the directory name in ES modules
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.dirname(__filename);
     
@@ -27,7 +23,6 @@ export function startApiServer() {
         issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL,
         secret: process.env.AUTH0_SECRET,
     };
-
 
     app.use(auth(config));
 

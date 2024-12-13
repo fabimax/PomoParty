@@ -1,4 +1,3 @@
-
 # Use Node.js LTS version
 FROM node:20-slim
 
@@ -14,8 +13,11 @@ RUN npm install
 # Copy source code
 COPY . .
 
+# Build frontend assets
+RUN npm run frontend-build
+
 # Expose ports for API server and reverse proxy
-EXPOSE 8000 8080
+EXPOSE 8000 8100
 
 # Start the application
-CMD [ "node", "backend/main.js" ] 
+CMD [ "npm", "run", "backend-start" ] 
