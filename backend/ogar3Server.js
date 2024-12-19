@@ -17,22 +17,22 @@ export function startRoom({port}) {
     serverPort: port
   };
   
-  const process = spawn('node', [
+  const ogarProcess = spawn('node', [
     path.join(__dirname, '../ogar3/startServer.js'),
     JSON.stringify(config)
   ], { detached: false });
 
-  serverProcesses.set(port, process);
+  serverProcesses.set(port, ogarProcess);
 
-  process.stdout.on('data', (data) => {
+  ogarProcess.stdout.on('data', (data) => {
     process.stdout.write(chalk.dim(`Ogar3 server ${port}: ${data}`));
   });
 
-  process.stderr.on('data', (data) => {
+  ogarProcess.stderr.on('data', (data) => {
     process.stdout.write(`Ogar3 server ${port} error: ${data}`);
   });
 
-  process.on('close', (code) => {
+  ogarProcess.on('close', (code) => {
     console.log(`Ogar3 server ${port} exited with code ${code}`);
     serverProcesses.delete(port);
   });

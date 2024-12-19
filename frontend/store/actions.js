@@ -13,7 +13,11 @@ export const actions = {
     updateTimeState: createActionType('UPDATE_TIME_STATE'),
   },
 
+  notifications: {
+    setPermission: createActionType('SET_NOTIFICATION_PERMISSION'),
+  },
+
   games: {
-    // Empty for now, but ready for future game actions
+    toggleFullscreen: createActionType('TOGGLE_FULLSCREEN'),
   }
 }; 

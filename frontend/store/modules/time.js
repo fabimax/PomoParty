@@ -1,5 +1,6 @@
 import moment from 'moment';
 import { actions } from '../actions';
+import { sendNotification } from './notifications';
 
 const initialState = {
   secondsRemaining: 0,
@@ -19,7 +20,8 @@ export function timeReducer(state = initialState, action) {
   }
 }
 
-export const updateTimeState = () => (dispatch) => {
+export const updateTimeState = () => (dispatch, getState) => {
+  const previousState = getState().time;
   const now = moment();
   const currentMinute = now.minutes();
   
@@ -44,6 +46,13 @@ export const updateTimeState = () => (dispatch) => {
 
   if (process.env.ALWAYS_FRONTEND_BREAK_TIME === 'true') {
     isGamePeriod = true;
+  }
+
+  if (!previousState.isNowBreakTime && isGamePeriod) {
+    dispatch(sendNotification('Break Time!', {
+      body: 'Time for a 5-minute game break!',
+      icon: '/favicon.ico'
+    }));
   }
 
   dispatch(actions.time.updateTimeState.create({

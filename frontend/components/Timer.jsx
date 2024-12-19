@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import moment from 'moment';
 import './Timer.css';
 
-export default function Timer() {
+export default function Timer({ styleMode = 'big' }) {
   const { secondsRemaining, nextEvent } = useSelector(state => state.time);
 
   const formatTime = (totalSeconds) => {
@@ -11,11 +11,18 @@ export default function Timer() {
     return `${duration.minutes().toString().padStart(2, '0')}:${duration.seconds().toString().padStart(2, '0')}`;
   };
 
+  if (styleMode === 'compact') {
+    return (
+      <div className="timer-container compact">
+        <span className="compact-text">{nextEvent} in {formatTime(secondsRemaining)}</span>
+      </div>
+    );
+  }
+
   return (
     <div className="timer-container">
       <h2 className="timer-heading">{nextEvent} In:</h2>
       <div className="countdown-display">{formatTime(secondsRemaining)}</div>
-      <p className="game-times">Games start at :25 and :55 every hour!</p>
     </div>
   );
 } 
