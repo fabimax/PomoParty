@@ -1,7 +1,6 @@
 export default {
-  schema: './backend/db/schema.js',
-  out: './backend/db/migrations',
-  driver: 'better-sqlite3',
+  schema: './backend/databaseSchema.js',
+  out: './migrations',
   dbCredentials: {
     url: 'sqlite.db'
   },

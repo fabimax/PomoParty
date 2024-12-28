@@ -3,8 +3,10 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import openid from 'express-openid-connect';
-const { auth, requiresAuth } = openid;
+const { auth: authBak, requiresAuth } = openid;
 import dotenv from 'dotenv';
+import * as auth from './authentication.js';
+import * as rpcMethods from './rpcMethods.js';
 
 dotenv.config();
 
@@ -23,16 +25,43 @@ export function startApiServer() {
     secret: process.env.AUTH0_SECRET,
   };
 
-  app.use(auth(authConfig));
+  app.use(authBak(authConfig));
 
-  app.use(cors({
-    origin: process.env.CURRENT_HOST,
-    credentials: true
-  }));
+  if (process.env.NODE_ENV === 'development') {
+    app.use(cors({
+      origin: 'http://localhost:1234',
+      credentials: true
+    }));
+  } else {
+    app.use(cors({
+      origin: process.env.CURRENT_HOST,
+      credentials: true
+    }));
+  }
 
   app.use(express.json());
 
   app.use('/', express.static(path.join(__dirname, '../dist')));
+
+  app.post('/rpc', async (req, res) => {
+    try {
+      if (process.env.SIMULATE_RPC_DELAY_MS) {
+        await new Promise(resolve => setTimeout(resolve, process.env.SIMULATE_RPC_DELAY_MS));
+      }
+      const { method, args } = req.body;
+      if (!method) {
+        return res.json({ error: 'Method is required' });
+      }
+      if (!rpcMethods[method]) {
+        return res.json({ error: `RPC method "${method}" not found` });
+      }
+      const data = await rpcMethods[method]({args});
+      res.json({data: data || true});
+    } catch (error) {
+      console.error(error);
+      res.json({ error: 'Unhandled server error' });
+    }
+  });
 
   app.get('/profile', requiresAuth(), (req, res) => {
     res.json(req.oidc.user);
@@ -66,6 +95,4 @@ export function startApiServer() {
   const server = app.listen(PORT, () => {
     console.log(`API Server listening on port ${PORT}`);
   });
-
-  return server;
 } 

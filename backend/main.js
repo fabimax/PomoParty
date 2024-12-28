@@ -4,13 +4,12 @@ import { startGameManager } from './gameManager.js';
 main()
 
 async function main() {
-  startGameManager();
+  // startGameManager();
 
-  const apiServer = startApiServer();
+  startApiServer();
 
   process.on('SIGINT', async () => {
     console.log('Shutting down...');
-    apiServer.close();
     process.exit();
   });
 }
