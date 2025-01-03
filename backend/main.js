@@ -4,7 +4,7 @@ import { startGameManager } from './gameManager.js';
 main()
 
 async function main() {
-  // startGameManager();
+  startGameManager();
 
   startApiServer();
 

@@ -1,19 +1,35 @@
-import * as schema from './databaseSchema.js';
+import * as databaseSchema from './databaseSchema.js';
 import db from './database.js';
 import * as yup from 'yup';
+import { eq, sql } from 'drizzle-orm';
 
-// TODO!: username and email uniqueness
 const userSchema = yup.object({
   username: yup.string()
     .required('Username is required')
     .matches( /^[a-zA-Z0-9._\-!@#$%^&*()+=<>?/\[\]{}|~]*$/, 'Username contains forbidden characters')
     .max(30, 'Too long! Username must be less than 30 characters long')
-    .transform(value => value?.trim()),
+    .transform(value => value?.trim())
+    .test('unique', 'Username is already taken', async function(value) {
+      if (!value) return true; // Skip if empty, let required validation handle it
+      const existingUser = await db.select()
+        .from(databaseSchema.users)
+        .where(sql`LOWER(${databaseSchema.users.username}) = ${value.toLowerCase()}`)
+        .get();
+      return !existingUser;
+    }),
   
   email: yup.string()
     .required('Email is required')
     .email('Please enter a valid email address')
-    .max(255, 'Too long! Email must be less than 255 characters long'),
+    .max(255, 'Too long! Email must be less than 255 characters long')
+    .test('unique', 'Email is already registered', async function(value) {
+      if (!value) return true; // Skip if empty, let required validation handle it
+      const existingUser = await db.select()
+        .from(databaseSchema.users)
+        .where(sql`LOWER(${databaseSchema.users.email}) = ${value.toLowerCase()}`)
+        .get();
+      return !existingUser;
+    }),
   
   password: yup.string()
     .required('Password is required')
@@ -35,12 +51,16 @@ const loginSchema = yup.object({
 });
 
 export async function getUsers() {
-  return await db.select().from(schema.users);
+  return await db.select().from(databaseSchema.users);
 }
 
-export async function createUser({username}) {
+export async function createUser({username, email, password}) {
+  let {success: isUserInfoValid } = await validateNewUser({username, email, password, repeatPassword: password});
+  if (!isUserInfoValid) {
+    throw new Error('Invalid user info');
+  }
   let uuid = crypto.randomUUID();
-  await db.insert(schema.users).values({ uuid, username });
+  await db.insert(databaseSchema.users).values({ uuid, username, email, password });
 }
 
 export async function validateNewUser(user) {

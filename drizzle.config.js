@@ -2,7 +2,7 @@ export default {
   schema: './backend/databaseSchema.js',
   out: './migrations',
   dbCredentials: {
-    url: 'sqlite.db'
+    url: 'database.sqlite'
   },
   dialect: 'sqlite'
 }; 

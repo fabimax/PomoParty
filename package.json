@@ -4,7 +4,9 @@
     "backend-dev": "NODE_ENV=development nodemon --legacy-watch --watch 'backend/**/*' --watch .env --watch package.json backend/main.js",
     "backend-start": "NODE_ENV=production node backend/main.js",
     "frontend-dev": "NODE_ENV=development parcel --watch-dir . frontend/index.html",
-    "frontend-build": "NODE_ENV=production parcel build frontend/index.html"
+    "frontend-build": "NODE_ENV=production parcel build frontend/index.html",
+    "database-create-migration": "drizzle-kit generate",
+    "database-apply-migrations": "drizzle-kit migrate"
   },
   "dependencies": {
     "autoprefixer": "^10.4.20",

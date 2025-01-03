@@ -11,7 +11,7 @@ export async function validateNewUser({args}) {
 
 export async function createUser({args}) {
   let {username, email, password} = args;
-  return await authentication.createUser({username});
+  await authentication.createUser({username, email, password});
 }
 
 export async function validateLogin({args}) {

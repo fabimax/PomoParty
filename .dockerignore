@@ -13,4 +13,8 @@ coverage
 .vercel
 .parcel-cache/
 dist/
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
 

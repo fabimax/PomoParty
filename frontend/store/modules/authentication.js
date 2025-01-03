@@ -56,22 +56,34 @@ export function authenticationReducer(state = initialState, action) {
 export const submitRegistrationForm = ({ username, email, password, repeatPassword }) => async (dispatch) => {
   dispatch(actions.authentication.registrationFormStartLoading.create());
   
-  const { data: validationInfo, error } = await rpc('validateNewUser', { username, email, password, repeatPassword });
-  if (error) {
-    //TODO: send error to unrecoverable toast
-    console.error(error);
+  const { data: validationInfo, error: validationError } = await rpc('validateNewUser', { username, email, password, repeatPassword });
+
+  if (validationError) {
+    // TODO: send error to unrecoverable toast
+    console.error(validationError);
     dispatch(actions.authentication.registrationFormStopLoading.create());
     return;
   }
+
   if (!validationInfo.success) {
     dispatch(actions.authentication.registrationFormSetErrorMessages.create(validationInfo.errors));
     dispatch(actions.authentication.registrationFormStopLoading.create());
     return;
   }
 
-  dispatch(actions.authentication.registrationFormStopLoading.create());
   dispatch(actions.authentication.registrationFormSetErrorMessages.create({}));
-  dispatch(router.navigateTo('/'));
+
+  const { data: createUserInfo, error: createUserError } = await rpc('createUser', { username, email, password });
+
+  if (createUserError) {
+    // TODO: send error to unrecoverable toast
+    console.error(createUserError);
+    dispatch(actions.authentication.registrationFormStopLoading.create());
+    return;
+  }
+
+  dispatch(actions.authentication.registrationFormStopLoading.create());
+  // dispatch(router.navigateTo('/'));
 };
 
 export const submitLoginForm = ({ username, password }) => async (dispatch) => {

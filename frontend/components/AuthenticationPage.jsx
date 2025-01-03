@@ -1,6 +1,7 @@
 import React from 'react';
 import RegistrationForm from './RegistrationForm';
 import LoginForm from './LoginForm';
+import DebugUserViewer from './DebugUserViewer';
 
 export default function AuthenticationPage() {
   return (
@@ -15,7 +16,7 @@ export default function AuthenticationPage() {
           <LoginForm />
         </div>
       </div>
-      <p className="text-center text-sm text-gray-500 mt-4">(for now these only check the variables and don't actually do anything else)</p>
+      <DebugUserViewer />
     </div>
   );
 } 

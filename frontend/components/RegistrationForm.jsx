@@ -6,7 +6,6 @@ import { AiOutlineLoading3Quarters as LoadingIcon } from "react-icons/ai";
 
 export default function RegistrationForm() {
   const dispatch = useDispatch();
-  const users = useSelector(state => state.authentication.users);
   const { loading, validationErrors } = useSelector(state => state.authentication.registrationForm);
   
   const [formData, setFormData] = useState({
