@@ -1025,12 +1025,14 @@ GameServer.prototype.switchSpectator = function(player) {
 };
 
 GameServer.prototype.MasterPing = function() {
+    /*
     try {
     fs.renameSync(path.join(__dirname, 'client/api/stats.txt'), path.join(__dirname, 'client/api/stats.txt.bak'));
     fs.appendFileSync(path.join(__dirname, 'client/api/stats.txt'),String(this.stats));
     } catch(error) {
         fs.appendFileSync('./client/api/stats.txt',String(this.stats));
     }
+    */
 }
 
 // Stats server
