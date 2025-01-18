@@ -10,6 +10,7 @@ export default function App() {
   const dispatch = useDispatch();
   const currentPath = useSelector(state => state.router.currentPath);
   const notificationPermission = useSelector(state => state.notifications.permission);
+  const currentUser = useSelector(state => state.authentication.currentUser);
 
   const isAuthPage = currentPath === '/register';
   const content = isAuthPage ? (
@@ -48,7 +49,8 @@ export default function App() {
               onClick={() => dispatch(navigateTo('/register'))}
               className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200"
             >
-              Register / Log in
+              {currentUser.loading ? 'Loading...' : 
+              currentUser.isLoggedIn ? currentUser.username : 'Register / Log in'}
             </button>
           </nav>
         </div>

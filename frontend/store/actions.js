@@ -29,5 +29,7 @@ export const actions = {
     loginFormStartLoading: createActionType('LOGIN_FORM_START_LOADING'),
     loginFormStopLoading: createActionType('LOGIN_FORM_STOP_LOADING'),
     loginFormSetErrorMessages: createActionType('LOGIN_FORM_SET_ERROR_MESSAGES'),
+    startLoadingCurrentUser: createActionType('START_LOADING_CURRENT_USER'),
+    updateCurrentUser: createActionType('UPDATE_CURRENT_USER'),
   }
 }; 

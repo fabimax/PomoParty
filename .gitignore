@@ -5,3 +5,4 @@ dist/
 .parcel-cache/
 ogar3/logs/playerlog.txt
 database.sqlite
+todo.txt
