@@ -22,19 +22,16 @@ function shouldGameBeRunning() {
     return true;
   }
 
-  const now = moment();
+  const now = moment()
   const minute = now.minutes();
   const second = now.seconds();
   
   const isFirstGamePeriod = 
-    (minute === 24 && second >= 30) ||
-    (minute >= 25 && minute <= 29) ||
-    (minute === 30 && second < 30);
+    (minute >= 29 && minute <= 35);
       
   const isSecondGamePeriod = 
-    (minute === 54 && second >= 30) ||
-    (minute >= 55 && minute <= 59) ||
-    (minute === 0 && second < 30);
-  
+    (minute === 59) ||
+    (minute >= 0 && minute <= 5)
+
   return isFirstGamePeriod || isSecondGamePeriod;
 }

@@ -22,26 +22,40 @@ export function timeReducer(state = initialState, action) {
 
 export const updateTimeState = () => (dispatch, getState) => {
   const previousState = getState().time;
-  const now = moment();
+  const now = moment()
   const currentMinute = now.minutes();
   
-  let isGamePeriod = (currentMinute >= 25 && currentMinute < 30) || 
-                     (currentMinute >= 55 && currentMinute < 60);
+  let isFirstGamePeriod = (currentMinute >= 30 && currentMinute < 35);
+  let isSecondGamePeriod = (currentMinute >= 0 && currentMinute < 5);
+  let isGamePeriod = isFirstGamePeriod || isSecondGamePeriod;
 
-  let nextIntervalMinute;
+  // Calculate next game interval start time
+  const getNextGameStart = (currentTime) => {
+    const hour = currentTime.hour();
+    const minute = currentTime.minute();
+    
+    if (minute < 30) {
+      // Next game is at :30
+      return moment(currentTime).hour(hour).minute(30).second(0);
+    } else if (minute < 60) {
+      // Next game is at next hour :00
+      return moment(currentTime).add(1, 'hour').minute(0).second(0);
+    }
+  };
+
   let secondsToNext;
-  
   if (isGamePeriod) {
-    nextIntervalMinute = currentMinute < 30 ? 30 : 0;
-    const nextInterval = moment(now).minutes(nextIntervalMinute).seconds(0);
-    if (nextIntervalMinute === 0) nextInterval.add(1, 'hour');
-    secondsToNext = nextInterval.diff(now, 'seconds');
+    // If we're in a game period, next event is 5 minutes from the period start
+    const periodStart = isFirstGamePeriod ? 30 : 0;
+    const periodEnd = moment(now).minute(periodStart + 5).second(0);
+    if (periodStart === 0) {
+      // Handle case when we're in the :00-:05 period
+      periodEnd.hour(now.hour());
+    }
+    secondsToNext = periodEnd.diff(now, 'seconds');
   } else {
-    nextIntervalMinute = currentMinute < 25 ? 25 : 55;
-    secondsToNext = moment(now)
-      .minutes(nextIntervalMinute)
-      .seconds(0)
-      .diff(now, 'seconds');
+    // If we're in work period, get time to next game period
+    secondsToNext = getNextGameStart(now).diff(now, 'seconds');
   }
 
   if (process.env.ALWAYS_FRONTEND_BREAK_TIME === 'true') {
