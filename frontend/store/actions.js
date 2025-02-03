@@ -3,6 +3,25 @@ const createActionType = (type) => ({
   create: (payload) => ({ type, payload })
 });
 
+export function createActions(actions) {
+  let newActions = {};
+  for (let actionName of Object.keys(actions)) {
+    newActions[actionName] = createActionType(actionName);
+  }
+  return newActions;
+}
+
+export function stateTransformReducer(initialState, transformers) {
+  return (state = initialState, action) => {
+    if (transformers[action.type]) {
+      let newState = JSON.parse(JSON.stringify(state));
+      transformers[action.type](newState, action.payload);
+      return newState;
+    }
+    return state;
+  }
+}
+
 export const actions = {
   router: {
     navigateTo: createActionType('NAVIGATE_TO'),
@@ -20,16 +39,4 @@ export const actions = {
   games: {
     toggleFullscreen: createActionType('TOGGLE_FULLSCREEN'),
   },
-
-  authentication: {
-    setUsers: createActionType('SET_USERS'),
-    registrationFormStartLoading: createActionType('REGISTRATION_FORM_START_LOADING'),
-    registrationFormStopLoading: createActionType('REGISTRATION_FORM_STOP_LOADING'),
-    registrationFormSetErrorMessages: createActionType('REGISTRATION_FORM_SET_ERROR_MESSAGES'),
-    loginFormStartLoading: createActionType('LOGIN_FORM_START_LOADING'),
-    loginFormStopLoading: createActionType('LOGIN_FORM_STOP_LOADING'),
-    loginFormSetErrorMessages: createActionType('LOGIN_FORM_SET_ERROR_MESSAGES'),
-    startLoadingCurrentUser: createActionType('START_LOADING_CURRENT_USER'),
-    updateCurrentUser: createActionType('UPDATE_CURRENT_USER'),
-  }
 }; 

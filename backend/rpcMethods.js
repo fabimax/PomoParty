@@ -33,6 +33,41 @@ export async function validateLogin({username, password}) {
   return await authentication.validateLogin({username, password});
 } 
 
+export async function getCurrentUser({cookies}) {
+  const userId = callerIdFromCookies(cookies);
+  if (!userId) {
+    return null;
+  }
+  return await authentication.getUserById(userId);
+}
+
+export async function updateUserSetting({cookies, field, value}) {
+  const userId = callerIdFromCookies(cookies);
+  if (!userId) {
+    throw new Error('User not logged in');
+  }
+  if (!['username', 'email'].includes(field)) {
+    throw new Error('Invalid field');
+  }
+  value = value.trim();
+  let {success, updatedUser, errors} = await authentication.updateUserSetting({userId, field, value});
+  if (success) {
+    return {
+      success,
+      updatedUser: {
+        id: updatedUser.uuid,
+        username: updatedUser.username,
+        email: updatedUser.email,
+      },
+    }
+  } else {
+    return {
+      success,
+      errors,
+    }
+  }
+}
+
 export async function getAuthCookie({userId, password}) {
   const jwt = await authentication.getAuthJWT({userId, password});
   return responseWithCookie({
@@ -63,12 +98,4 @@ export async function clearAuthCookie() {
       }
     }
   });
-}
-
-export async function getCurrentUser({cookies}) {
-  const userId = callerIdFromCookies(cookies);
-  if (!userId) {
-    return null;
-  }
-  return await authentication.getUserById(userId);
 }

@@ -6,13 +6,15 @@ import { gamesReducer } from './modules/games';
 import { timeReducer, startTimeUpdates } from './modules/time';
 import { notificationsReducer, initializeNotifications } from './modules/notifications';
 import { authenticationReducer, initializeCurrentUser } from './modules/authentication';
+import { toastReducer } from './modules/toast';
 
 const rootReducer = combineReducers({
   router: routerReducer,
   games: gamesReducer,
   time: timeReducer,
   notifications: notificationsReducer,
-  authentication: authenticationReducer
+  authentication: authenticationReducer,
+  toast: toastReducer,
 });
 
 const store = createStore(rootReducer, applyMiddleware(thunk));

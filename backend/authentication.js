@@ -98,10 +98,6 @@ const loginSchema = yup.object({
     }),
 });
 
-export async function getUsers() {
-  return await db.select().from(databaseSchema.users);
-}
-
 export async function validateLogin(credentials) {
   try {
     await loginSchema.validate(credentials, { abortEarly: false });
@@ -132,6 +128,47 @@ export async function validateLogin(credentials) {
     return {
       success: false,
       errors
+    };
+  }
+}
+
+export async function updateUserSetting({userId, field, value}) {
+  // Get the validator for this field from userSchema
+  const validator = userSchema.fields[field];
+
+  try {
+    await validator.validate(value, {abortEarly: false});
+    
+
+    await db.update(databaseSchema.users)
+      .set({ [field]: value })
+      .where(eq(databaseSchema.users.uuid, userId));
+
+    let user = await db.select()
+      .from(databaseSchema.users)
+      .where(eq(databaseSchema.users.uuid, userId))
+      .get();
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+
+    return {
+      success: true,
+      updatedUser: {
+        ...user,
+        updatedUser: user,
+      }
+    };
+  } catch (error) {
+    if (!(error instanceof yup.ValidationError)) {
+      throw error;
+    }
+
+    return {
+      success: false,
+      errors: error.errors,
     };
   }
 }

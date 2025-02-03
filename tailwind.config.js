@@ -4,7 +4,8 @@ module.exports = {
     "./frontend/index.html"
   ],
   theme: {
-    extend: {},
+    extend: {
+    },
   },
   plugins: [],
 }

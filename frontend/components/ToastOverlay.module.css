@@ -1,0 +1,11 @@
+@keyframes toast-slide {
+  0% { transform: translateY(100%) translateX(-50%); }
+  5% { transform: translateY(-4rem) translateX(-50%); }
+  95% { transform: translateY(-4rem) translateX(-50%); }
+  100% { transform: translateY(100%) translateX(-50%); }
+}
+
+.animate {
+  animation: toast-slide 3s ease-in-out forwards;
+  position: absolute;
+} 

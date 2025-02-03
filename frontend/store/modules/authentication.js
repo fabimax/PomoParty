@@ -1,13 +1,47 @@
-import { actions } from '../actions';
 import { rpc } from '../../api';
 import * as router from './router';
+import { showToast } from './toast';
+import { standardApiRequest } from '../standardApiRequest';
+import { createActions } from '../actions';
+import { stateTransformReducer } from '../actions';
 
-const initialState = {
+let actions = createActions({
+  registrationFormSetLoading: 'REGISTRATION_FORM_SET_LOADING',
+  registrationFormSetErrorMessages: 'REGISTRATION_FORM_SET_ERROR_MESSAGES',
+  loginFormSetLoading: 'LOGIN_FORM_SET_LOADING',
+  loginFormSetErrorMessages: 'LOGIN_FORM_SET_ERROR_MESSAGES',
+  currentUserSetLoading: 'CURRENT_USER_SET_LOADING',
+  updateCurrentUser: 'UPDATE_CURRENT_USER',
+  updateLocalProfileSetting: 'UPDATE_LOCAL_PROFILE_SETTING',
+  cancelLocalProfileSetting: 'CANCEL_LOCAL_PROFILE_SETTING',
+  setProfileSettingUpdating: 'SET_PROFILE_SETTING_UPDATING',
+  updateProfileSettingError: 'UPDATE_PROFILE_SETTING_ERROR',
+  // updateProfileFromRemote: 'UPDATE_PROFILE_FROM_REMOTE',
+});
+
+export const authenticationReducer = stateTransformReducer({
   currentUser: {
     isLoggedIn: false,
     id: null,
     username: null,
+    email: null,
     loading: true,
+  },
+  profileSettings: {
+    username: {
+      localValue: null,
+      isLoading: false,
+      isDisabled: false,
+      isControlsShown: false,
+      errorMessages: [],
+    },
+    email: {
+      localValue: null,
+      isLoading: false,
+      isDisabled: false,
+      isControlsShown: false,
+      errorMessages: [],
+    },
   },
   registrationForm: {
     loading: false,
@@ -16,147 +50,184 @@ const initialState = {
   loginForm: {
     loading: false,
     validationErrors: {}
-  }
-};
+  },
+  }, {
 
-export function authenticationReducer(state = initialState, action) {
-  switch (action.type) {
-    case actions.authentication.registrationFormStartLoading.type:
-      return { 
-        ...state, 
-        registrationForm: { ...state.registrationForm, loading: true } 
-      };
-    case actions.authentication.registrationFormStopLoading.type:
-      return { 
-        ...state, 
-        registrationForm: { ...state.registrationForm, loading: false } 
-      };
-    case actions.authentication.registrationFormSetErrorMessages.type:
-      return { 
-        ...state, 
-        registrationForm: { ...state.registrationForm, validationErrors: action.payload } 
-      };
-    case actions.authentication.loginFormStartLoading.type:
-      return { 
-        ...state, 
-        loginForm: { ...state.loginForm, loading: true } 
-      };
-    case actions.authentication.loginFormStopLoading.type:
-      return { 
-        ...state, 
-        loginForm: { ...state.loginForm, loading: false } 
-      };
-    case actions.authentication.loginFormSetErrorMessages.type:
-      return { 
-        ...state, 
-        loginForm: { ...state.loginForm, validationErrors: action.payload } 
-      };
-    case actions.authentication.updateCurrentUser.type:
-      return { 
-        ...state, 
-        currentUser: { ...state.currentUser, ...action.payload, loading: false } 
-      };
-    case actions.authentication.startLoadingCurrentUser.type:
-      return { 
-        ...state, 
-        currentUser: { ...state.currentUser, loading: true } 
-      };
-    default:
-      return state;
+  [actions.updateCurrentUser.type]: (state, payload) => {
+    for (let [key, value] of Object.entries(payload)) {
+      state.currentUser[key] = value;
+      stateUpdateLocalProfileSetting(state, key, value);
+    }
+  },
+
+  [actions.updateLocalProfileSetting.type]: (state, payload) => {
+    stateUpdateLocalProfileSetting(state, payload.key, payload.value);
+  },
+
+  [actions.cancelLocalProfileSetting.type]: (state, payload) => {
+    if (!Object.keys(state.profileSettings).includes(payload.key)) {
+      return console.error(`Profile setting key ${payload.key} not found`);
+    }
+    state.profileSettings[payload.key].localValue = state.currentUser[payload.key];
+    state.profileSettings[payload.key].isControlsShown = false;
+    state.profileSettings[payload.key].errorMessages = [];
+  },
+
+  [actions.setProfileSettingUpdating.type]: (state, payload) => {
+    if (!Object.keys(state.profileSettings).includes(payload.key)) {
+      return console.error(`Profile setting key ${payload.key} not found`);
+    }
+    state.profileSettings[payload.key].isLoading = payload.isUpdating;
+    state.profileSettings[payload.key].isDisabled = payload.isUpdating;
+    if (payload.isUpdating) {
+      state.profileSettings[payload.key].errorMessages = [];
+    }
+  },
+
+  [actions.updateProfileSettingError.type]: (state, payload) => {
+    if (Object.keys(state.profileSettings).includes(payload.key)) {
+      state.profileSettings[payload.key].errorMessages = payload.errors;
+    }
+  },
+
+  [actions.currentUserSetLoading.type]: (state, isLoading) => {
+    state.currentUser.loading = isLoading;
+  },
+
+  [actions.registrationFormSetLoading.type]: (state, isLoading) => {
+    state.registrationForm.loading = isLoading;
+  },
+
+  [actions.registrationFormSetErrorMessages.type]: (state, payload) => {
+    state.registrationForm.validationErrors = payload;
+  },
+
+  [actions.loginFormSetLoading.type]: (state, isLoading) => {
+    state.loginForm.loading = isLoading;
+  },
+
+  [actions.loginFormSetErrorMessages.type]: (state, payload) => {
+    state.loginForm.validationErrors = payload;
+  },
+});
+
+function stateUpdateLocalProfileSetting(state, key, value) {
+  if (!Object.keys(state.profileSettings).includes(key)) {
+    return;
+  }
+  state.profileSettings[key].localValue = value;
+  if (value !== state.currentUser[key]) {
+    state.profileSettings[key].isControlsShown = true;
+  } else {
+    state.profileSettings[key].isControlsShown = false;
   }
 }
 
-export const submitRegistrationForm = ({ username, email, password, repeatPassword }) => async (dispatch) => {
-  dispatch(actions.authentication.registrationFormStartLoading.create());
-  
-  const { data: validationInfo, error: validationError } = await rpc('validateNewUser', { username, email, password, repeatPassword });
-
-  if (validationError) {
-    // TODO: send error to unrecoverable toast
-    console.error(validationError);
-    dispatch(actions.authentication.registrationFormStopLoading.create());
-    return;
-  }
-
-  if (!validationInfo.success) {
-    dispatch(actions.authentication.registrationFormSetErrorMessages.create(validationInfo.errors));
-    dispatch(actions.authentication.registrationFormStopLoading.create());
-    return;
-  }
-
-  const { data: userId, error: createUserError } = await rpc('createUser', { username, email, password });
-
-  if (createUserError) {
-    // TODO: send error to unrecoverable toast
-    console.error(createUserError);
-    dispatch(actions.authentication.registrationFormStopLoading.create());
-    return;
-  }
-
-  dispatch(actions.authentication.registrationFormSetErrorMessages.create({}));
-
-  const { data: authCookieInfo, error: authCookieError } = await rpc('getAuthCookie', { userId, password });
-
-  if (authCookieError) {
-    // TODO: send error to unrecoverable toast
-    console.error(authCookieError);
-    dispatch(actions.authentication.registrationFormStopLoading.create());
-    return;
-  }
-
-  await dispatch(initializeCurrentUser());
-  dispatch(actions.authentication.registrationFormStopLoading.create());
-  dispatch(router.navigateTo('/'));
-};
-
 export const submitLoginForm = ({ username, password }) => async (dispatch) => {
-  dispatch(actions.authentication.loginFormStartLoading.create());
-  
-  const { data: validationInfo, error } = await rpc('validateLogin', { username, password });
-  if (error) {
-    console.error(error);
-    dispatch(actions.authentication.loginFormStopLoading.create());
-    return;
-  }
+  let validationInfo = await dispatch(standardApiRequest({
+    method: 'validateLogin',
+    args: { username, password },
+    errorMessage: 'Failed to validate log in',
+    dispatchSetLoading: actions.loginFormSetLoading,
+  }));
   
   if (!validationInfo.success) {
-    dispatch(actions.authentication.loginFormSetErrorMessages.create(validationInfo.errors));
-    dispatch(actions.authentication.loginFormStopLoading.create());
+    dispatch(actions.loginFormSetErrorMessages.create(validationInfo.errors));
     return;
   }
 
-  dispatch(actions.authentication.loginFormSetErrorMessages.create({}));
+  dispatch(actions.loginFormSetErrorMessages.create({}));
 
-  const { error: authCookieError } = await rpc('getAuthCookie', { userId: validationInfo.userId, password });
-  if (authCookieError) {
-    // TODO: send error to unrecoverable toast
-    console.error(authCookieError);
-    dispatch(actions.authentication.loginFormStopLoading.create());
-    return;
-  }
+  await dispatch(standardApiRequest({
+    method: 'getAuthCookie',
+    args: { userId: validationInfo.userId, password },
+    errorMessage: 'Failed to log in',
+    dispatchSetLoading: actions.loginFormSetLoading,
+  }));
 
   await dispatch(initializeCurrentUser());
-  dispatch(actions.authentication.loginFormStopLoading.create());
   dispatch(router.navigateTo('/'));
+  dispatch(showToast({message: 'You are now logged in', type: 'success'}));
 };
 
-export const logout = () => async (dispatch) => {
-  await rpc('clearAuthCookie');
+
+export const submitRegistrationForm = ({ username, email, password, repeatPassword }) => async (dispatch) => {
+  let validationInfo = await dispatch(standardApiRequest({
+    method: 'validateNewUser',
+    args: { username, email, password, repeatPassword },
+    errorMessage: 'Failed to validate registration',
+    dispatchSetLoading: actions.registrationFormSetLoading,
+  }));
+
+  if (!validationInfo.success) {
+    dispatch(actions.registrationFormSetErrorMessages.create(validationInfo.errors));
+    return;
+  }
+
+  dispatch(actions.registrationFormSetErrorMessages.create({}));
+
+  let userId = await dispatch(standardApiRequest({
+    method: 'createUser',
+    args: { username, email, password },
+    errorMessage: 'Failed to create user',
+    dispatchSetLoading: actions.registrationFormSetLoading,
+  }));
+
+  await dispatch(standardApiRequest({
+    method: 'getAuthCookie',
+    args: { userId, password },
+    errorMessage: 'Failed to log in',
+    dispatchSetLoading: actions.registrationFormSetLoading,
+  }));
+
   await dispatch(initializeCurrentUser());
+  dispatch(router.navigateTo('/'));
+  dispatch(showToast({message: 'You are now logged in', type: 'success'}));
+};
+
+export const updateLocalProfileSetting = (key, value) => async (dispatch) => {
+  dispatch(actions.updateLocalProfileSetting.create({ key, value }));
+};
+
+export const cancelLocalProfileSetting = (key) => async (dispatch) => {
+  dispatch(actions.cancelLocalProfileSetting.create({ key }));
+};
+
+export const saveProfileSetting = (key) => async (dispatch, getState) => {
+  let state = getState().authentication;
+  let result = await dispatch(standardApiRequest({
+    method: 'updateUserSetting',
+    args: { field: key, value: state.profileSettings[key].localValue },
+    errorMessage: 'Failed to edit profile',
+    dispatchSetLoading: isUpdating => actions.setProfileSettingUpdating.create({ key, isUpdating }),
+  }));
+  if (!result.success) {
+    dispatch(actions.updateProfileSettingError.create({ key, errors: result.errors }));
+    return;
+  }
+  dispatch(actions.updateCurrentUser.create({[key]: result.updatedUser[key]}));
+  dispatch(showToast({message: 'Profile updated', type: 'success'}));
 };
 
 export const initializeCurrentUser = () => async (dispatch) => {
-  dispatch(actions.authentication.startLoadingCurrentUser.create());
-  const { data: currentUser, error } = await rpc('getCurrentUser');
-  if (error) {
-    // TODO: send error to unrecoverable toast
-    console.error(error);
-    dispatch(actions.authentication.updateCurrentUser.create({ isLoggedIn: false }));
-    return;
-  }
+  let currentUser = await dispatch(standardApiRequest({
+    method: 'getCurrentUser',
+    errorMessage: 'Failed to get current user',
+    dispatchSetLoading: actions.currentUserSetLoading,
+  }));
   if (!currentUser) {
-    dispatch(actions.authentication.updateCurrentUser.create({ isLoggedIn: false }));
+    dispatch(actions.updateCurrentUser.create({ isLoggedIn: false }));
     return;
   }
-  dispatch(actions.authentication.updateCurrentUser.create({ isLoggedIn: true, ...currentUser }));
+  dispatch(actions.updateCurrentUser.create({ isLoggedIn: true, ...currentUser }));
+};
+
+export const logout = () => async (dispatch) => {
+  await dispatch(standardApiRequest({
+    method: 'clearAuthCookie',
+    errorMessage: 'Failed to log out',
+  }));
+
+  await dispatch(initializeCurrentUser());
+  dispatch(showToast({message: 'You are now logged out', type: 'success'}));
 };
