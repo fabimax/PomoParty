@@ -5,7 +5,7 @@ import { sendNotification } from './notifications';
 const initialState = {
   secondsRemaining: 0,
   nextEvent: 'Game starts',
-  isNowBreakTime: false
+  isNowBreakTime: false,
 };
 
 export function timeReducer(state = initialState, action) {

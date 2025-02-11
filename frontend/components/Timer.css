@@ -1,13 +1,26 @@
 .timer-container {
     text-align: center;
-    padding: 3rem 0;
+    padding: 3rem;
     border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
 }
 
 .timer-container.compact {
     padding: 0.5rem 1rem;
     background-color: rgba(255, 255, 255, 0.5);
     border-radius: 4px;
+}
+
+.timer-content {
+    flex: 1;
+}
+
+.timer-image {
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
 }
 
 .compact-text {

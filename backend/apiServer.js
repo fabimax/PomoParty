@@ -54,18 +54,9 @@ export function startApiServer() {
     }
   });
 
-  if (process.env.NODE_ENV != 'development') {
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(__dirname, '../dist/index.html'));
-    });
-  } else {
-    // Proxy all non-matched requests to the development server
-    app.use('*', createProxyMiddleware({
-      target: 'http://localhost:1234',
-      changeOrigin: true,
-      ws: true, // Enable WebSocket proxy
-    }));
-  }
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../dist/index.html'));
+  });
 
   app.listen(PORT, () => {
     console.log(`API Server listening on port ${PORT}`);

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import moment from 'moment';
+import clockImage from '../public/pomoclock.png';
 import './Timer.css';
 
 export default function Timer({ styleMode = 'big' }) {
@@ -21,8 +22,11 @@ export default function Timer({ styleMode = 'big' }) {
 
   return (
     <div className="timer-container">
-      <h2 className="timer-heading">{nextEvent} In:</h2>
-      <div className="countdown-display">{formatTime(secondsRemaining)}</div>
+      <img src={clockImage} alt="Pomodoro Clock" className="timer-image" />
+      <div className="timer-content">
+        <h2 className="timer-heading">{nextEvent} In:</h2>
+        <div className="countdown-display">{formatTime(secondsRemaining)}</div>
+      </div>
     </div>
   );
 } 

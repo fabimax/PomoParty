@@ -16,7 +16,7 @@ export default function App() {
     <AuthenticationPage />
   ) : (
     <>
-      <p className="game-times">Games start at :25 and :55 every hour!</p>
+      <p className="game-times">Five-minute games start at :00 and :30 every hour!</p>
       <GameDisplay />
     </>
   );
