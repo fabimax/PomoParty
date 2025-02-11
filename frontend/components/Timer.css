@@ -7,6 +7,24 @@
     gap: 2rem;
 }
 
+/* Mobile layout */
+@media (max-width: 768px) {
+    .timer-container {
+        flex-direction: column-reverse;
+        padding: 2rem 1rem;
+        gap: 1rem;
+    }
+
+    .timer-content {
+        width: 100%;
+    }
+
+    .timer-image {
+        width: 150px;
+        height: 150px;
+    }
+}
+
 .timer-container.compact {
     padding: 0.5rem 1rem;
     background-color: rgba(255, 255, 255, 0.5);
