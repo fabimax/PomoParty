@@ -9,3 +9,10 @@ export const users = sqliteTable('users', {
   createdAt: integer('createdAt').notNull().default(sql`CURRENT_TIMESTAMP`),
   updatedAt: integer('updatedAt').notNull().default(sql`CURRENT_TIMESTAMP`),
 });
+
+export const chatMessages = sqliteTable('chatMessages', {
+  uuid: text('uuid').primaryKey().notNull(),
+  messageText: text('messageText').notNull(),
+  createdAt: integer('createdAt').notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: integer('updatedAt').notNull().default(sql`CURRENT_TIMESTAMP`),
+});

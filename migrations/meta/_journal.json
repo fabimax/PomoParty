@@ -43,6 +43,20 @@
       "when": 1737018051376,
       "tag": "0005_moaning_mordo",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1739667063189,
+      "tag": "0006_secret_leopardon",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1739667542326,
+      "tag": "0007_burly_famine",
+      "breakpoints": true
     }
   ]
 }

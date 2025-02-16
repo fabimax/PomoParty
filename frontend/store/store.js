@@ -7,6 +7,7 @@ import { timeReducer, startTimeUpdates } from './modules/time';
 import { notificationsReducer, initializeNotifications } from './modules/notifications';
 import { authenticationReducer, initializeCurrentUser } from './modules/authentication';
 import { toastReducer } from './modules/toast';
+import { chatReducer } from './modules/chat';
 
 const rootReducer = combineReducers({
   router: routerReducer,
@@ -15,6 +16,7 @@ const rootReducer = combineReducers({
   notifications: notificationsReducer,
   authentication: authenticationReducer,
   toast: toastReducer,
+  chat: chatReducer,
 });
 
 const store = createStore(rootReducer, applyMiddleware(thunk));

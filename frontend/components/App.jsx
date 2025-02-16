@@ -4,6 +4,7 @@ import GameDisplay from './GameDisplay';
 import AuthenticationPage from './AuthenticationPage';
 import ToastOverlay from './ToastOverlay';
 import { navigateTo } from '../store/modules/router';
+import MainPage from './MainPage';
 import './App.css';
 
 export default function App() {
@@ -11,15 +12,12 @@ export default function App() {
   const currentPath = useSelector(state => state.router.currentPath);
   const currentUser = useSelector(state => state.authentication.currentUser);
 
-  const isAuthPage = currentPath === '/profile';
-  const content = isAuthPage ? (
-    <AuthenticationPage />
-  ) : (
-    <>
-      <p className="game-times">Five-minute games start at :00 and :30 every hour!</p>
-      <GameDisplay />
-    </>
-  );
+  let content = <p className="text-center text-2xl"> Page not found </p>;
+  if (currentPath === '/') {
+    content = <MainPage />;
+  } else if (currentPath === '/profile') {
+    content = <AuthenticationPage />;
+  }
 
   return (
     <>

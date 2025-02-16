@@ -1,4 +1,6 @@
 import * as authentication from './authentication.js';
+import * as chat from './chat.js';
+import { eq } from 'drizzle-orm';
 
 export const SET_COOKIE_SYMBOL = Symbol('SET_COOKIE');
 
@@ -98,4 +100,22 @@ export async function clearAuthCookie() {
       }
     }
   });
+}
+
+export async function getChatMessages() {
+  const allMessages = await chat.getAllMessages();
+  return allMessages.map(msg => ({
+    id: msg.uuid,
+    username: 'anonymous',
+    text: msg.messageText,
+  }));
+}
+
+export async function sendChatMessage({ text }) {
+  await chat.createMessage(text);
+  return {
+    id: crypto.randomUUID(),
+    username: 'anonymous',
+    text: text.trim(),
+  };
 }
