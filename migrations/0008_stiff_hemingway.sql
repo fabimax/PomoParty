@@ -1,0 +1,1 @@
+ALTER TABLE `chatMessages` ADD `userId` text REFERENCES users(uuid);

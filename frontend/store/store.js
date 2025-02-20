@@ -7,7 +7,7 @@ import { timeReducer, startTimeUpdates } from './modules/time';
 import { notificationsReducer, initializeNotifications } from './modules/notifications';
 import { authenticationReducer, initializeCurrentUser } from './modules/authentication';
 import { toastReducer } from './modules/toast';
-import { chatReducer } from './modules/chat';
+import { chatReducer, initializeChat } from './modules/chat';
 
 const rootReducer = combineReducers({
   router: routerReducer,
@@ -25,5 +25,6 @@ store.dispatch(initializeHistoryListener());
 store.dispatch(startTimeUpdates());
 store.dispatch(initializeNotifications());
 store.dispatch(initializeCurrentUser());
+store.dispatch(initializeChat());
 
 export default store;

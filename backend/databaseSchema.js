@@ -6,13 +6,14 @@ export const users = sqliteTable('users', {
   username: text('username').notNull().unique(),
   email: text('email').notNull().unique(),
   passwordHash: text('passwordHash').notNull(),
-  createdAt: integer('createdAt').notNull().default(sql`CURRENT_TIMESTAMP`),
-  updatedAt: integer('updatedAt').notNull().default(sql`CURRENT_TIMESTAMP`),
+  createdAt: integer('createdAt').notNull().default(sql`UNIXEPOCH() * 1000`),
+  updatedAt: integer('updatedAt').notNull().default(sql`UNIXEPOCH() * 1000`),
 });
 
 export const chatMessages = sqliteTable('chatMessages', {
   uuid: text('uuid').primaryKey().notNull(),
+  userId: text('userId').references(() => users.uuid),
   messageText: text('messageText').notNull(),
-  createdAt: integer('createdAt').notNull().default(sql`CURRENT_TIMESTAMP`),
-  updatedAt: integer('updatedAt').notNull().default(sql`CURRENT_TIMESTAMP`),
+  createdAt: integer('createdAt').notNull().default(sql`UNIXEPOCH() * 1000`),
+  updatedAt: integer('updatedAt').notNull().default(sql`UNIXEPOCH() * 1000`),
 });

@@ -11,14 +11,14 @@ export default function GameDisplay() {
 
   if (!isNowBreakTime) {
     return (
-      <div className="game-container waiting-screen">
+      <div className="mb-8 game-container waiting-screen">
         <Timer styleMode="big" />
       </div>
     );
   }
 
   return (
-    <div className={`game-container-wrapper ${(isFullscreen && isNowBreakTime) ? 'fullscreen' : ''}`}>
+    <div className={`mb-8 game-container-wrapper ${(isFullscreen && isNowBreakTime) ? 'fullscreen' : ''}`}>
       <iframe 
         width="1600" 
         height="900" 

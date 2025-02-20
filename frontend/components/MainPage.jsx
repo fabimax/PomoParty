@@ -4,7 +4,7 @@ import Chat from './Chat';
 
 export default function MainPage() {
   return (
-    <div className="space-y-8">
+    <div>
       <p className="game-times">Five-minute games start at :00 and :30 every hour!</p>
       <GameDisplay />
       <Chat />
