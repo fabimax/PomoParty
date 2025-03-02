@@ -71,6 +71,27 @@
       "when": 1739885896217,
       "tag": "0009_aromatic_dazzler",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1740873222464,
+      "tag": "0010_glorious_silver_fox",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "6",
+      "when": 1740873452561,
+      "tag": "0011_noisy_goblin_queen",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "6",
+      "when": 1740873550286,
+      "tag": "0012_nervous_whistler",
+      "breakpoints": true
     }
   ]
 }

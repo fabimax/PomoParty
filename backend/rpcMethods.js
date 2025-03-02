@@ -1,5 +1,6 @@
 import * as authentication from './authentication.js';
 import * as chat from './chat.js';
+import * as todo from './todo.js';
 import moment from 'moment';
 import { eq } from 'drizzle-orm';
 
@@ -121,4 +122,68 @@ export async function sendChatMessage({ cookies, text }) {
   });
 
   return { success: true };
+}
+
+export async function createTodo({ cookies, text }) {
+  const userId = callerIdFromCookies(cookies);
+  if (!userId) {
+    throw new Error('User not logged in');
+  }
+  
+  await todo.createTodo({ userId, text });
+  
+  return await todo.getTodosByUserId(userId);
+}
+
+export async function getMyTodos({ cookies }) {
+  const userId = callerIdFromCookies(cookies);
+  if (!userId) {
+    throw new Error('User not logged in');
+  }
+  
+  return await todo.getTodosByUserId(userId);
+}
+
+export async function setTodoComplete({ cookies, uuid, complete }) {
+  const userId = callerIdFromCookies(cookies);
+  if (!userId) {
+    throw new Error('User not logged in');
+  }
+  
+  await todo.updateTodoCompletion({
+    todoId: uuid,
+    userId,
+    completed: !!complete
+  });
+  
+  return await todo.getTodosByUserId(userId);
+}
+
+export async function editTodoText({ cookies, uuid, newText }) {
+  const userId = callerIdFromCookies(cookies);
+  if (!userId) {
+    throw new Error('User not logged in');
+  }
+  
+  await todo.updateTodoText({
+    todoId: uuid,
+    userId,
+    newText
+  });
+  
+  return await todo.getTodosByUserId(userId);
+}
+
+export async function deleteTodo({ cookies, uuid }) {
+  const userId = callerIdFromCookies(cookies);
+  if (!userId) {
+    throw new Error('User not logged in');
+  }
+  
+  await todo.deleteTodo({
+    todoId: uuid,
+    userId
+  });
+  
+  return await todo.getTodosByUserId(userId);
 }

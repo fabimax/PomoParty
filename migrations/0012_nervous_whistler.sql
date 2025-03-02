@@ -1,0 +1,1 @@
+PRAGMA noop_because_changed_schema_but_dont_want_to_update_db;

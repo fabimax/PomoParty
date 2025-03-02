@@ -5,6 +5,7 @@ import AuthenticationPage from './AuthenticationPage';
 import ToastOverlay from './ToastOverlay';
 import { navigateTo } from '../store/modules/router';
 import MainPage from './MainPage';
+import TodoPage from './TodoPage';
 import './App.css';
 
 export default function App() {
@@ -17,6 +18,8 @@ export default function App() {
     content = <MainPage />;
   } else if (currentPath === '/profile') {
     content = <AuthenticationPage />;
+  } else if (currentPath === '/todos') {
+    content = <TodoPage />;
   }
 
   return (
@@ -32,6 +35,13 @@ export default function App() {
             </button>
           </h1>
           <nav>
+            { currentUser.isLoggedIn && <button 
+              onClick={() => dispatch(navigateTo('/todos'))}
+              className="hover:text-blue-600 transition-colors duration-200 mr-4"
+            >
+              Task List
+            </button>
+            }
             <button
               onClick={() => dispatch(navigateTo('/profile'))}
               className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200"

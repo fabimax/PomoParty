@@ -17,3 +17,12 @@ export const chatMessages = sqliteTable('chatMessages', {
   createdAt: integer('createdAt').notNull().default(sql`UNIXEPOCH() * 1000`),
   updatedAt: integer('updatedAt').notNull().default(sql`UNIXEPOCH() * 1000`),
 });
+
+export const todos = sqliteTable('todos', {
+  uuid: text('uuid').primaryKey().notNull(),
+  userId: text('userId').references(() => users.uuid).notNull(),
+  text: text('text').notNull(),
+  completed: integer('completed', { mode: 'boolean' }).notNull().default(false),
+  createdAt: integer('createdAt').notNull().default(sql`UNIXEPOCH() * 1000`),
+  updatedAt: integer('updatedAt').notNull().default(sql`UNIXEPOCH() * 1000`),
+});

@@ -8,6 +8,7 @@ import { notificationsReducer, initializeNotifications } from './modules/notific
 import { authenticationReducer, initializeCurrentUser } from './modules/authentication';
 import { toastReducer } from './modules/toast';
 import { chatReducer, initializeChat } from './modules/chat';
+import { todoReducer } from './modules/todo';
 
 const rootReducer = combineReducers({
   router: routerReducer,
@@ -17,6 +18,7 @@ const rootReducer = combineReducers({
   authentication: authenticationReducer,
   toast: toastReducer,
   chat: chatReducer,
+  todo: todoReducer,
 });
 
 const store = createStore(rootReducer, applyMiddleware(thunk));
