@@ -34,27 +34,27 @@ export default function Chat() {
   shownMessages.sort((a, b) => a.timestamp - b.timestamp);
 
   return (
-    <div className="bg-white rounded-lg shadow p-4 h-[800px] flex flex-col">
+    <div className="bg-gray-800 rounded shadow-lg border border-gray-700 p-4 h-[800px] flex flex-col">
       <div className="mb-4">
-        <h3 className="text-center font-semibold text-gray-700 text-xl">Global Chat</h3>
+        <h3 className="text-center font-semibold text-xl">Global Chat</h3>
       </div>
-      
-      <div 
+
+      <div
         ref={messagesContainerRef}
         className="flex-1 overflow-y-auto"
       >
         {shownMessages.map(message => (
           <div key={message.uuid} className="mb-2">
-            <span className="font-bold text-blue-600">{message.username}: </span>
-            <span className="text-black">{message.text}</span>
+            <span className="font-bold text-blue-400">{message.username}: </span>
+            <span className="text-gray-200">{message.text}</span>
           </div>
         ))}
       </div>
-      
+
       <form onSubmit={(e) => {
           e.preventDefault();
           dispatch(sendChatMessage());
-        }} className="border-t pt-4">
+        }} className="border-t border-gray-700 pt-4">
         <div className="relative">
           <input
             type="text"
@@ -62,16 +62,16 @@ export default function Chat() {
             onChange={(e) => dispatch(updateDraftMessage(e.target.value))}
             disabled={loading}
             placeholder="Type a message..."
-            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black ${
-              validationErrors?.text?.length > 0 ? 'border-red-500' : 'border-gray-300'
+            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-200 ${
+              validationErrors?.text?.length > 0 ? 'border-red-500' : 'border-gray-600'
             } ${
-              loading ? 'bg-gray-100' : 'bg-white'
+              loading ? 'bg-gray-700' : 'bg-gray-900'
             }`}
           />
           {validationErrors?.text?.length > 0 && (
             <div className="mt-2">
               {validationErrors.text.map((error, index) => (
-                <p key={index} className="text-sm text-red-500">
+                <p key={index} className="text-sm text-red-400">
                   {error}
                 </p>
               ))}
