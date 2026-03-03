@@ -182,7 +182,7 @@ GameServer.prototype.start = function() {
         throw e;
     });
 
-    function connectionEstablished(ws) {
+    function connectionEstablished(ws, req) {
         if (this.clients.length >= this.config.serverMaxConnections) { // Server full
             console.log("\u001B[33mClient tried to connect, but server player limit has been reached!\u001B[0m");
             ws.close();
@@ -193,7 +193,7 @@ GameServer.prototype.start = function() {
             return;
         }
 
-        var origin = ws.upgradeReq.headers.origin;
+        var origin = req.headers.origin;
 	    if (this.config.serverMaxConnPerIp) {
             for (var cons = 1, i = 0, llen = this.clients.length; i < llen; i++) {
                 if (this.clients[i].remoteAddress == ws._socket.remoteAddress) {
